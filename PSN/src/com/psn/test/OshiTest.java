@@ -57,7 +57,7 @@ public class OshiTest {
         OperatingSystem os = si.getOperatingSystem();
         System.out.println(os);
 
-        // printComputerSystem(hal.getComputerSystem());
+         printComputerSystem(hal.getComputerSystem());
         //
         // printProcessor(hal.getProcessor());
         //
@@ -73,7 +73,7 @@ public class OshiTest {
         //
         // printDisks(hal.getDiskStores());
         //
-        // printFileSystem(os.getFileSystem());
+         printFileSystem(os.getFileSystem());
         //
         // printNetworkInterfaces(hal.getNetworkIFs());
         //
