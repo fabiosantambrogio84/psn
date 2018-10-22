@@ -188,9 +188,9 @@ public class OshiTest {
 
     private static void printSensors(Sensors sensors) {
         System.out.println("Sensors:");
-        System.out.format(" CPU Temperature: %.1f°C%n", sensors.getCpuTemperature());
+        //System.out.format(" CPU Temperature: %.1f°C%n", sensors.getCpuTemperature());
         System.out.println(" Fan Speeds: " + Arrays.toString(sensors.getFanSpeeds()));
-        System.out.format(" CPU Voltage: %.1fV%n", sensors.getCpuVoltage());
+        //System.out.format(" CPU Voltage: %.1fV%n", sensors.getCpuVoltage());
     }
 
     private static void printPowerSources(PowerSource[] powerSources) {
