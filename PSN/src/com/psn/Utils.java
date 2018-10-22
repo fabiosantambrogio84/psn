@@ -6,6 +6,10 @@ import java.util.List;
 
 public class Utils {
 
+	public static String getFileName(String filePath) {
+        return filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.length());
+    }
+	
     public static String getFileNameNoExt(String filePath) {
         int lastDotIndex = filePath.lastIndexOf('.');
         int endIndex = lastDotIndex;
