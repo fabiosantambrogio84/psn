@@ -2,13 +2,15 @@ package com.psn.models;
 
 public enum FileStatus {
 
-    START("Start"), ENCODING("In codifica"), ENCODED("Codificato"), ERROR_ENCODING("Errore nella codifica"), DECODING(
-            "In decodifica"), DECODED("Decodificato"), ERROR_DECODING("Errore nella decodifica");
+    START("In attesa", null), ENCODED("Codificato","-fx-background-color: #47d8e5;"), DECODED("Decodificato","-fx-background-color: #6ff271;"), ERROR_ENCODING("Errore","-fx-background-color: #e51b1b;"), ERROR_DECODING("Errore","-fx-background-color: #e51b1b;");
 
     private String label;
+    
+    private String uiRowStyle;
 
-    FileStatus(String label) {
+    FileStatus(String label, String uiRowStyle) {
         this.label = label;
+        this.uiRowStyle = uiRowStyle;
     }
 
     /**
@@ -18,6 +20,15 @@ public enum FileStatus {
      */
     public String getLabel() {
         return label;
+    }
+    
+    /**
+     * Retrieves the row UI style associated to the status.
+     * 
+     * @return The UI style of a row .
+     */
+    public String getRowUiStyle() {
+        return uiRowStyle;
     }
 
 }
