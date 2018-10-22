@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.psn.engine.DecoderService;
 import com.psn.engine.EncoderService;
-import com.psn.engine.EncoderTask;
 import com.psn.models.FileStatus;
 import com.psn.models.PSNFile;
 
@@ -32,6 +32,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -45,6 +47,8 @@ import javafx.util.Callback;
 
 public class Launcher extends Application {
 
+	private Context context;
+	
     private ObservableList<PSNFile> observableFileList = FXCollections.observableArrayList(p -> new Observable[] {
             new SimpleStringProperty(p.getAbsolutePath()), new SimpleObjectProperty<FileStatus>(p.getStatus()) });
 
@@ -56,13 +60,19 @@ public class Launcher extends Application {
 
     private StackPane stack = new StackPane();
 
-    VBox box = new VBox(progressIndicator);
+    private VBox box = new VBox(progressIndicator);
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void start(Stage primaryStage) {
 
-        final EncoderService service = new EncoderService(observableFileList);
+    	/* Check the running usb drive */
+    	
+    	/* Load initial context */
+    	context = Context.getInstance();
+    	
+        final EncoderService encoderService = new EncoderService(observableFileList);
+        final DecoderService decoderService = new DecoderService(observableFileList);
 
         observableFileList.addListener(createListener("observableFileList"));
 
@@ -100,8 +110,7 @@ public class Launcher extends Application {
                         setStyle("");
                     } else {
                         setText(item);
-                        setStyle("-fx-font-weight: bold;");
-
+                        setStyle("-fx-font-weight: bold; -fx-alignment: CENTER-LEFT;");
                     }
                 }
             };
@@ -116,13 +125,11 @@ public class Launcher extends Application {
                         setText(null);
                         setStyle("");
                     } else {
-                        setText(item.getLabel());
-                        if (FileStatus.START.equals(item)) {
-                            setStyle("-fx-background-color: grey;");
-                        } else {
-                            setStyle("-fx-background-color: green;");
-                        }
-
+                    	setText(item.getLabel());
+                    	String cellStyle = "-fx-alignment: CENTER;";
+                    	String rowStyle = item.getRowUiStyle();
+                    	setStyle(cellStyle);
+                    	getTableRow().setStyle(rowStyle);
                     }
                 }
             };
@@ -136,10 +143,11 @@ public class Launcher extends Application {
             public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<PSNFile, Boolean> p) {
                 return new SimpleBooleanProperty(p.getValue() != null);
             }
-
+            
         });
         actionCol.setSortable(false);
         actionCol.setResizable(false);
+        actionCol.setStyle("-fx-alignment: CENTER;");
 
         /* Add the button to the cell */
         actionCol.setCellFactory(new Callback<TableColumn<PSNFile, Boolean>, TableCell<PSNFile, Boolean>>() {
@@ -157,6 +165,43 @@ public class Launcher extends Application {
         /* Add the list for containing the files */
         table.setItems(observableFileList);
 
+        /* Create the button 'Codifica' */
+        Button encodeButton = new Button(Configuration.UI_ENCODE_BUTTON);
+        encodeButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                System.out.println("Encode button pressed");
+                stack.setDisable(true);
+                box.setVisible(true);
+                encoderService.restart();
+                encoderService.setOnSucceeded(w -> {
+                    box.setVisible(false);
+                    stack.setDisable(false);
+                });
+            }
+        });
+        encodeButton.setDisable(true);
+        encodeButton.setStyle("-fx-font-size:20; -fx-font-weight: bold;");
+
+        /* Create the button 'Decodifica' */
+        Button decodeButton = new Button(Configuration.UI_DECODE_BUTTON);
+        decodeButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                System.out.println("Decode button pressed");
+                stack.setDisable(true);
+                box.setVisible(true);
+                decoderService.restart();
+                decoderService.setOnSucceeded(w -> {
+                    box.setVisible(false);
+                    stack.setDisable(false);
+                });
+            }
+        });
+        decodeButton.setDisable(true);
+        decodeButton.setStyle("-fx-font-size:20; -fx-font-weight: bold;");
+
+        
         /* Handle the drag over on the table */
         table.setOnDragOver(new EventHandler<DragEvent>() {
 
@@ -191,69 +236,28 @@ public class Launcher extends Application {
                         observableFileList.add(psnFile);
                         System.out.println(f.getAbsolutePath());
                     }
+                    encodeButton.setDisable(false);
+                    decodeButton.setDisable(false);
                     success = true;
                 }
                 event.setDropCompleted(success);
                 event.consume();
             }
         });
-
-        /* Create the button 'Codifica' */
-        Button encodeButton = new Button(Configuration.UI_ENCODE_BUTTON);
-        encodeButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                System.out.println("Encode button pressed");
-                stack.setDisable(true);
-                box.setVisible(true);
-                service.restart();
-                service.setOnSucceeded(w -> {
-                    box.setVisible(false);
-                    stack.setDisable(false);
-                });
-
-                // processRows();
-                // for (int i = 0; i < observableFileList.size(); i++) {
-                // PSNFile psnFile = observableFileList.get(i);
-                // System.out.println("Encoding " + psnFile.getAbsolutePath());
-                // psnFile.setStatus(FileStatus.ENCODING);
-                // observableFileList.set(i, psnFile);
-                //
-                // try {
-                // Thread.sleep(3000);
-                // } catch (InterruptedException e1) {
-                // // TODO Auto-generated catch block
-                // e1.printStackTrace();
-                // }
-                // psnFile.setStatus(FileStatus.ENCODED);
-                // observableFileList.set(i, psnFile);
-                // System.out.println(psnFile.getAbsolutePath() + " encoded");
-                // }
-            }
-
-        });
-
-        /* Create the button 'Decodifica' */
-        Button decodeButton = new Button(Configuration.UI_DECODE_BUTTON);
-        decodeButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                System.out.println("Decode button pressed");
-            }
-        });
-
+        
         /* Create the horizontal box containing the encode/decode buttons */
         HBox hBox = new HBox(10, encodeButton, decodeButton);
-
+        hBox.setAlignment(Pos.CENTER);
+        
         Region veil = new Region();
         veil.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4)");
         veil.setMaxWidth(800);
         veil.setMaxHeight(500);
 
         progressIndicator.setMaxSize(800, 500);
-        progressIndicator.progressProperty().bind(service.progressProperty());
-        veil.visibleProperty().bind(service.runningProperty());
-        progressIndicator.visibleProperty().bind(service.runningProperty());
+        progressIndicator.progressProperty().bind(encoderService.progressProperty());
+        veil.visibleProperty().bind(encoderService.runningProperty());
+        progressIndicator.visibleProperty().bind(encoderService.runningProperty());
         // table.itemsProperty().bind(service.valueProperty());
 
         /* Create the vertical box containing the title, the table and the buttons */
@@ -294,28 +298,28 @@ public class Launcher extends Application {
         Application.launch(args);
     }
 
-    private void processRows() {
-        try {
-            EncoderTask task = new EncoderTask(observableFileList);
-
-            task.setOnRunning((succeesesEvent) -> {
-                System.out.println(task.getMessage());
-                System.out.println("RUNNING");
-            });
-
-            task.setOnSucceeded((succeededEvent) -> {
-                observableFileList = task.getValue();
-                System.out.println("SUCCESS");
-            });
-
-            Thread th = new Thread(task);
-            th.setDaemon(false);
-            th.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    private void processRows() {
+//        try {
+//            EncoderTask task = new EncoderTask(observableFileList);
+//
+//            task.setOnRunning((succeesesEvent) -> {
+//                System.out.println(task.getMessage());
+//                System.out.println("RUNNING");
+//            });
+//
+//            task.setOnSucceeded((succeededEvent) -> {
+//                observableFileList = task.getValue();
+//                System.out.println("SUCCESS");
+//            });
+//
+//            Thread th = new Thread(task);
+//            th.setDaemon(false);
+//            th.start();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private static ListChangeListener<PSNFile> createListener(String listId) {
         return (Change<? extends PSNFile> c) -> {

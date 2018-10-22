@@ -14,7 +14,7 @@ public interface Configuration {
 
     public static final String ALGORITHM = "5050";
 
-    public static final String UI_STAGE_TITLE_LABEL = "Elenco files";
+    public static final String UI_STAGE_TITLE_LABEL = "File da processare";
 
     public static final String UI_MAIN_LABEL_TEXT = "Trascina qui i files";
 
