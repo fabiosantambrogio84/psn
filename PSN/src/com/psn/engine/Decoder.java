@@ -1,6 +1,7 @@
 package com.psn.engine;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -9,21 +10,24 @@ import com.psn.Utils;
 
 public class Decoder {
 
-    public static void decode(String filePath) throws Exception {
+    @SuppressWarnings("unused")
+	public static void decode(String filePath) throws Exception {
 
         long startTime = System.currentTimeMillis();
-
         System.out.println("Decoding file '" + filePath + "'");
 
         /* The input streams for reading the files */
         BufferedInputStream bin1 = null;
         BufferedInputStream bin2 = null;
 
-        /* The output stream for writing the decoded file */
+        /* The output stream for writing the temporary decoded file */
         FileOutputStream fos1 = null;
 
-        /* Get the name of the file without extension */
+        /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
+        
+        /* Create the path for the temporary decoded file */
+        String decodedFilePath = filePath + ".decx";
 
         System.out.println("File name: " + fileNameNoExt);
 
@@ -33,7 +37,7 @@ public class Decoder {
             bin2 = new BufferedInputStream(new FileInputStream(".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT));
 
             /* Create the output stream */
-            fos1 = new FileOutputStream(".\\" + fileNameNoExt + ".decx");
+            fos1 = new FileOutputStream(decodedFilePath);
 
             /* Create the bytes buffer */
             byte[] bbuf1 = new byte[4096];
@@ -43,15 +47,8 @@ public class Decoder {
             int len1 = 0;
             int len2 = 0;
             boolean continueProcessing = true;
-            int sum = 0;
-
-            /* Create the lists for containing the processed bytes */
-            // List<Byte> bytesList = new ArrayList<>();
-            // List<Byte> bytesList2 = new ArrayList<>();
-            // List<Byte> newList = new ArrayList<Byte>(bbuf1.length);
 
             /* Process the input file */
-            // while (/* (len1 = bin1.read(bbuf1)) != -1 && */ (len2 = bin2.read(bbuf2)) != -1) {
             while (continueProcessing) {
                 len1 = bin1.read(bbuf1);
                 len2 = bin2.read(bbuf2);
@@ -63,74 +60,46 @@ public class Decoder {
                     fos1.write(bbuf2);
 
                     index = index + 1;
-
-                    System.out.println("--> LEN1: " + len1);
-
-                    sum = sum + len1 + len2;
                 }
-                // if (index % 2 == 0) {
-                // fos1.write(bbuf1);
-                // } else {
-                // fos1.write(bbuf2);
-                // }
-
-                // for (int i = 0; i < bbuf1.length; i++) {
-                // newList.add(bbuf1[i]);
-                // newList.add(bbuf2[i]);
-                // if (i % 2 == 0) {
-                // newList.add(bbuf1[i]);
-                // newList.add(bbuf2[i / 2]);
-                // } else {
-                // newList.add(bbuf1[i]);
-                // }
-                // if (i % 2 == 0) {
-                // // byte[] bTemp = new byte[1];
-                // // bTemp[0] = bbuf2[i / 2];
-                // // newList.add(i + 1, bTemp[0]);
-                // newList.add(i, bbuf1[0]);
-                // } else {
-                // newList.add(i, bbuf1[0]);
-                // }
-                // }
             }
-            System.out.println("--> INDEX: " + index);
-            System.out.println("--> SUM: " + sum);
-            // for (Byte b : newList) {
-            // System.out.println(b);
-            // }
-
-            /* Write the decoded file */
-            // fos1.write(Bytes.toArray(newList), 0, newList.size());
-
-            /* Process the encrypted file */
-            // while ((bin2.read(bbuf2)) != -1) {
-            // for (int i = 0; i < bbuf2.length; i++) {
-            // bytesList2.add(bbuf2[i]);
-            // }
-            // }
-
-            // System.out.println(bytesList.size() + " - " + new String(Bytes.toArray(bytesList), StandardCharsets.UTF_8));
-            // System.out.println(bytesList2.size() + " - " + new String(Bytes.toArray(bytesList2), StandardCharsets.UTF_8));
-
-            /* Reconstruct the file */
-            // for (int i = 0; i < bytesList.size(); i++) {
-            // if (i % 2 == 0) {
-            // System.out.println("--> " + i);
-            // byte[] bTemp = new byte[1];
-            // bTemp[0] = bytesList2.get(i / 2);
-            // newList.add(i + 1, bytesList2.get(i / 2));
-            // }
-            // }
-
-            /* Write the decoded file */
-            // fos1.write(Bytes.toArray(newList), 0, newList.size());
-
+            
+            /* Close the streams */
+            if (bin1 != null) {
+                bin1.close();
+            }
+            if (bin2 != null) {
+                bin2.close();
+            }
+            if (fos1 != null) {
+                fos1.close();
+            }
+            
+            /* Rename the original file to '.old' version */
+            File originalFile = new File(filePath);
+            System.out.println("Rename file '"+filePath+"' to '"+originalFile.getAbsolutePath()+".old"+"'");
+            String originalFileOldVersionPath = originalFile.getAbsolutePath()+".old";
+            originalFile.renameTo(new File(originalFileOldVersionPath));
+            
+            /* Rename the '.decx' version of the file to the original extension */
+            File decodedFile = new File(decodedFilePath);
+            System.out.println("Rename file '"+decodedFilePath+"' to '"+filePath+"'");
+            decodedFile.renameTo(new File(filePath));
+            
+            /* Remove the '.old' version of the original file */
+            System.out.println("Delete file '"+originalFileOldVersionPath+"'");
+            File originalFileOldVersion = new File(originalFileOldVersionPath);
+            originalFileOldVersion.delete();
+            
             long endTime = System.currentTimeMillis();
-
             System.out.println("End decoding in " + (endTime - startTime) + " millis");
-
         } catch (Exception e) {
             e.printStackTrace();
+            try{
+            	new File(decodedFilePath).delete();
+            }catch(Exception e1){
+            	System.out.println("Errore cancellazione file");
+            }
+            throw e;
         } finally {
             if (bin1 != null) {
                 bin1.close();

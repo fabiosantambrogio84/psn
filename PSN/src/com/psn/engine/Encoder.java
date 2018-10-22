@@ -1,42 +1,43 @@
 package com.psn.engine;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 import com.psn.Configuration;
 import com.psn.Utils;
-import com.psn.test.PerformanceTest;
 
 public class Encoder {
 
     public static void encode(String filePath) throws Exception {
 
         long startTime = System.currentTimeMillis();
-
         System.out.println("Encoding file '" + filePath + "'");
 
-        /* The output streams for overwritting the original file and creating the encoded file */
+        /* The output streams for overwriting the original file and creating the encoded file */
         FileOutputStream fos1 = null;
         FileOutputStream fos2 = null;
 
-        /* Get the name of the file without extension */
+        /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
+        
+        /* Create the path for the temporary version of the original file */
+        String originalFileTmpPath = filePath + ".tmp";
+        
+        /* Create the path of the encoded file*/
+        String encodedFilePath = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
 
         System.out.println("File name: " + fileNameNoExt);
 
-        try (BufferedInputStream in = (BufferedInputStream) PerformanceTest.class.getResourceAsStream(filePath)) {
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath))) {
 
             /* Create the bytes buffer */
             byte[] bbuf = new byte[4096];
 
-            /* Create the lists for containing the processed bytes */
-            // List<Byte> bytesListOrig = new ArrayList<>();
-            // List<Byte> bytesList = new ArrayList<>();
-            // List<Byte> bytesList2 = new ArrayList<>();
-
             /* Create the output streams */
-            fos1 = new FileOutputStream(".\\" + fileNameNoExt + ".tmp");
-            fos2 = new FileOutputStream(".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT);
+            fos1 = new FileOutputStream(originalFileTmpPath);
+            fos2 = new FileOutputStream(encodedFilePath);
 
             System.out.println("Processing bytes...");
 
@@ -50,41 +51,44 @@ public class Encoder {
                     fos2.write(bbuf, 0, len);
                 }
                 index = index + 1;
-                // bytesListOrig.addAll(Bytes.asList(bbuf));
-                // for (int i = 0; i < bbuf.length; i++) {
-                // if (i % 2 == 0) {
-                // bytesList.add(bbuf[i]);
-                // // fos1.write(bbuf[i], 0, 1);
-                // } else {
-                // bytesList2.add(bbuf[i]);
-                // }
-                // }
             }
 
-            // System.out.println("Overwritting original file...");
-            //
-            // /* Overwrite the bytes of the original file */
-            // fos1.write(Bytes.toArray(bytesList), 0, bytesList.size());
-            //
-            // System.out.println("Original file successfully overwritten");
-            //
-            // System.out.println("Writting encoded file...");
-            //
-            // /* Write the encoded file */
-            // fos2.write(Bytes.toArray(bytesList2), 0, bytesList2.size());
-            //
-            // System.out.println("Encoded file successfully written");
-
-            // System.out.println(bytesListOrig.size() + " - " + new String(Bytes.toArray(bytesListOrig), StandardCharsets.UTF_8));
-            // System.out.println(bytesList.size() + " - " + new String(Bytes.toArray(bytesList), StandardCharsets.UTF_8));
-            // System.out.println(bytesList2.size() + " - " + new String(Bytes.toArray(bytesList2), StandardCharsets.UTF_8));
-
+            /* Close the streams */
+            if (fos1 != null) {
+                fos1.close();
+            }
+            if (fos2 != null) {
+                fos2.close();
+            }
+            in.close();
+            
+            /* Rename the original file to '.old' version */
+            File originalFile = new File(filePath);
+            System.out.println("Rename file '"+filePath+"' to '"+originalFile.getAbsolutePath()+".old"+"'");
+            String originalFileOldVersionPath = originalFile.getAbsolutePath()+".old";
+            originalFile.renameTo(new File(originalFileOldVersionPath));
+            
+            /* Rename the '.tmp' version of the original file to the original extension */
+            File newOriginalFile = new File(originalFileTmpPath);
+            System.out.println("Rename file '"+originalFileTmpPath+"' to '"+filePath+"'");
+            newOriginalFile.renameTo(new File(filePath));
+            
+            /* Delete the '.old' version of the original file */
+            System.out.println("Delete file '"+originalFileOldVersionPath+"'");
+            File originalFileOldVersion = new File(originalFileOldVersionPath);
+            originalFileOldVersion.delete();
+            
             long endTime = System.currentTimeMillis();
-
             System.out.println("End encoding in " + (endTime - startTime) + " millis");
-
         } catch (Exception e) {
             e.printStackTrace();
+            try{
+            	new File(originalFileTmpPath).delete();
+            	new File(encodedFilePath).delete();
+            }catch(Exception e1){
+            	System.out.println("Errore cancellazione file");
+            }
+            throw e;
         } finally {
             if (fos1 != null) {
                 fos1.close();

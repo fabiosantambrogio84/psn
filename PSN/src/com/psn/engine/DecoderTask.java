@@ -6,11 +6,11 @@ import com.psn.models.PSNFile;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-public class EncoderTask extends Task<ObservableList<PSNFile>> {
+public class DecoderTask extends Task<ObservableList<PSNFile>> {
 
     ObservableList<PSNFile> observableFileList = null;
 
-    public EncoderTask(ObservableList<PSNFile> observableFileList) {
+    public DecoderTask(ObservableList<PSNFile> observableFileList) {
         this.observableFileList = observableFileList;
     }
 
@@ -18,17 +18,18 @@ public class EncoderTask extends Task<ObservableList<PSNFile>> {
     protected ObservableList<PSNFile> call() throws Exception {
 
         for (int i = 0; i < observableFileList.size(); i++) {
-        	PSNFile psnFile = observableFileList.get(i);
-        	try{
-                String psnFilePath = psnFile.getAbsolutePath();
-                Encoder.encode(psnFilePath);
-                psnFile.setStatus(FileStatus.ENCODED);
+            PSNFile psnFile = observableFileList.get(i);
+            try{
+            	String psnFilePath = psnFile.getAbsolutePath();
+            	Decoder.decode(psnFilePath);            	
+            	psnFile.setStatus(FileStatus.DECODED);
                 observableFileList.set(i, psnFile);
                 updateProgress(i, observableFileList.size());
             }catch(Exception e){
-            	psnFile.setStatus(FileStatus.ERROR_ENCODING);
-            	observableFileList.set(i, psnFile);
+            	psnFile.setStatus(FileStatus.ERROR_DECODING);
+                observableFileList.set(i, psnFile);
                 updateProgress(i, observableFileList.size());
+                System.out.println("SONO QUI");
             }
         }
         return observableFileList;
