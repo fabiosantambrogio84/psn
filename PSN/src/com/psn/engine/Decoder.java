@@ -5,16 +5,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.psn.Configuration;
 import com.psn.Utils;
 
 public class Decoder {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(Decoder.class);
+	
     @SuppressWarnings("unused")
 	public static void decode(String filePath) throws Exception {
 
         long startTime = System.currentTimeMillis();
-        System.out.println("Decoding file '" + filePath + "'");
+        LOGGER.info("Decoding file '" + filePath + "'");
 
         /* The input streams for reading the files */
         BufferedInputStream bin1 = null;
@@ -26,15 +31,16 @@ public class Decoder {
         /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
         
+        /* Get the path of the encoded file */
+        String encodedFilePath = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        
         /* Create the path for the temporary decoded file */
         String decodedFilePath = filePath + ".decx";
-
-        System.out.println("File name: " + fileNameNoExt);
 
         try {
             /* Create the input streams */
             bin1 = new BufferedInputStream(new FileInputStream(filePath));
-            bin2 = new BufferedInputStream(new FileInputStream(".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT));
+            bin2 = new BufferedInputStream(new FileInputStream(encodedFilePath));
 
             /* Create the output stream */
             fos1 = new FileOutputStream(decodedFilePath);
@@ -74,30 +80,39 @@ public class Decoder {
                 fos1.close();
             }
             
+            LOGGER.info("File '"+filePath+"' successfully decoded");
+            
             /* Rename the original file to '.old' version */
             File originalFile = new File(filePath);
-            System.out.println("Rename file '"+filePath+"' to '"+originalFile.getAbsolutePath()+".old"+"'");
+            LOGGER.info("Rename file '"+filePath+"' to '"+originalFile.getAbsolutePath()+".old"+"'");
             String originalFileOldVersionPath = originalFile.getAbsolutePath()+".old";
             originalFile.renameTo(new File(originalFileOldVersionPath));
             
             /* Rename the '.decx' version of the file to the original extension */
             File decodedFile = new File(decodedFilePath);
-            System.out.println("Rename file '"+decodedFilePath+"' to '"+filePath+"'");
+            LOGGER.info("Rename file '"+decodedFilePath+"' to '"+filePath+"'");
             decodedFile.renameTo(new File(filePath));
             
             /* Remove the '.old' version of the original file */
-            System.out.println("Delete file '"+originalFileOldVersionPath+"'");
+            LOGGER.info("Deleting file '"+originalFileOldVersionPath+"'");
             File originalFileOldVersion = new File(originalFileOldVersionPath);
-            originalFileOldVersion.delete();
+            boolean deleteResult = originalFileOldVersion.delete();
+            LOGGER.info("File '"+originalFileOldVersionPath+"' deleted? "+deleteResult);
+            
+            /* Remove the encoded file '.encx' */
+            LOGGER.info("Deleting file '"+encodedFilePath+"'");
+            File encodedFile = new File(encodedFilePath);
+            boolean deleteResult2 = encodedFile.delete();
+            LOGGER.info("File '"+encodedFilePath+"' deleted? "+deleteResult2);
             
             long endTime = System.currentTimeMillis();
-            System.out.println("End decoding in " + (endTime - startTime) + " millis");
+            LOGGER.info("End decoding in " + (endTime - startTime) + " millis");
         } catch (Exception e) {
-            e.printStackTrace();
+        	LOGGER.error("Exception: ", e);
             try{
             	new File(decodedFilePath).delete();
             }catch(Exception e1){
-            	System.out.println("Errore cancellazione file");
+            	LOGGER.error("Errore cancellazione file");
             }
             throw e;
         } finally {

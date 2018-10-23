@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.psn.engine.DecoderService;
 import com.psn.engine.EncoderService;
 import com.psn.models.FileStatus;
@@ -47,6 +50,8 @@ import javafx.util.Callback;
 
 public class Launcher extends Application {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
+	
 	private Context context;
 	
     private ObservableList<PSNFile> observableFileList = FXCollections.observableArrayList(p -> new Observable[] {
@@ -66,6 +71,8 @@ public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+    	LOGGER.info("Start application");
+    	
     	/* Check the running usb drive */
     	
     	/* Load initial context */
@@ -170,7 +177,6 @@ public class Launcher extends Application {
         encodeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                System.out.println("Encode button pressed");
                 stack.setDisable(true);
                 box.setVisible(true);
                 encoderService.restart();
@@ -188,7 +194,6 @@ public class Launcher extends Application {
         decodeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                System.out.println("Decode button pressed");
                 stack.setDisable(true);
                 box.setVisible(true);
                 decoderService.restart();
@@ -234,7 +239,7 @@ public class Launcher extends Application {
                     for (File f : fileList) {
                         PSNFile psnFile = new PSNFile(f.getAbsolutePath());
                         observableFileList.add(psnFile);
-                        System.out.println(f.getAbsolutePath());
+                        LOGGER.info("Add file '"+f.getAbsolutePath()+"'");
                     }
                     encodeButton.setDisable(false);
                     decodeButton.setDisable(false);
