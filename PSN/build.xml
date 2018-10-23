@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project PSN with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR file Export Wizard-->
+    <!--ANT 1.7 is required-->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="C:/Java/eclipse_workspace"/>
+    <property name="dir.jarfile" value="${dir.buildfile}"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/PSN.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="com.psn.Launcher"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ commons-lang3-3.2.1.jar libusb4java-1.2.0-linux-arm.jar libusb4java-1.2.0-linux-x86_64.jar libusb4java-1.2.0-linux-x86.jar libusb4java-1.2.0-osx-x86_64.jar libusb4java-1.2.0-osx-x86.jar libusb4java-1.2.0-windows-x86_64.jar libusb4java-1.2.0-windows-x86.jar usb-api-1.0.2.jar usb4java-1.2.0.jar usb4java-javax-1.2.0.jar commons-codec-1.11.jar guava-23.0.jar oshi-json-3.8.3.jar javax.json-1.0.jar jna.jar jna-platform.jar logback-classic-1.2.3.jar logback-core-1.2.3.jar slf4j-api-1.7.25.jar json-smart-2.3.jar json-path-2.4.0.jar asm-1.0.2.jar jackson-core-2.9.6.jar jackson-databind-2.9.6.jar jackson-annotations-2.9.6.jar org.eclipse.fx.ide.css.jfx8_2.4.0.201605112122.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/bin"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="commons-lang3-3.2.1.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-linux-arm.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-linux-x86_64.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-linux-x86.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-osx-x86_64.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-osx-x86.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-windows-x86_64.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="libusb4java-1.2.0-windows-x86.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="usb-api-1.0.2.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="usb4java-1.2.0.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="usb4java-javax-1.2.0.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="commons-codec-1.11.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="guava-23.0.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="oshi-json-3.8.3.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="javax.json-1.0.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="jna.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="jna-platform.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="logback-classic-1.2.3.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="logback-core-1.2.3.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="slf4j-api-1.7.25.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="json-smart-2.3.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="json-path-2.4.0.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="asm-1.0.2.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="jackson-core-2.9.6.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="jackson-databind-2.9.6.jar"/>
+            <zipfileset dir="C:/Users/Fabio Santambrogio/git/psn/PSN/lib" includes="jackson-annotations-2.9.6.jar"/>
+            <zipfileset dir="C:/Java/eclipse-jee-neon-3-win32-x86_64/plugins" includes="org.eclipse.fx.ide.css.jfx8_2.4.0.201605112122.jar"/>
+        </jar>
+    </target>
+</project>
