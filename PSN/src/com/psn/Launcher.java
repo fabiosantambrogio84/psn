@@ -28,15 +28,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -73,10 +74,17 @@ public class Launcher extends Application {
 
     	LOGGER.info("Start application");
     	
-    	/* Check the running usb drive */
-    	
     	/* Load initial context */
     	context = Context.getInstance();
+    	
+    	/* Check the running usb drive */
+    	try{
+    		context.checkUsbVidPid();
+    	} catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
+    	LOGGER.info("Running on drive '"+context.getRunningDriveLetter()+"'");
     	
         final EncoderService encoderService = new EncoderService(observableFileList);
         final DecoderService decoderService = new DecoderService(observableFileList);
@@ -292,7 +300,21 @@ public class Launcher extends Application {
 
         /* Display the application */
         primaryStage.show();
+        
+        /* Show confirmation dialog on application exit */
+        primaryStage.setOnCloseRequest(evt -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.NO, ButtonType.YES);
+            alert.setTitle("Uscita applicazione");
+            alert.setHeaderText("Sei sicuro di chiudere l'applicazione?");
+            ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
 
+            if (ButtonType.NO.equals(result)) {
+              // no choice or no clicked -> don't close
+              evt.consume();
+            } else{
+            	System.exit(0);
+            }
+        });
     }
 
     /**
