@@ -4,9 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import com.jayway.jsonpath.Criteria;
-import com.jayway.jsonpath.Filter;
 import com.psn.Configuration;
 
 import net.minidev.json.JSONArray;
@@ -30,6 +29,7 @@ import oshi.json.software.os.NetworkParams;
 import oshi.json.software.os.OSFileStore;
 import oshi.json.software.os.OSProcess;
 import oshi.json.software.os.OperatingSystem;
+import oshi.json.util.PropertiesUtil;
 import oshi.software.os.OperatingSystem.ProcessSort;
 import oshi.util.FormatUtil;
 import oshi.util.Util;
@@ -83,16 +83,16 @@ public class OshiTest {
         // printDisplays(hal.getDisplays());
 
         // hardware: USB devices
-        // printUsbDevices(hal.getUsbDevices(true));
-        String serialNumber = getSerialNumber(hal.getUsbDevices(true));
-        System.out.println("--> " + serialNumber);
+        printUsbDevices(hal.getUsbDevices(true));
+//        String serialNumber = getSerialNumber(hal.getUsbDevices(true));
+//        System.out.println("--> " + serialNumber);
 
         // Load properties from this file on the classpath
-        // Properties props = PropertiesUtil.loadProperties("oshi.json.properties");
+        Properties props = PropertiesUtil.loadProperties("oshi.json.properties");
         // Pretty JSON
         // System.out.println(si.toPrettyJSON(props));
         // Compact JSON
-        // System.out.println(si.toCompactJSON(props));
+         System.out.println(si.toCompactJSON(props));
     }
 
     private static void printComputerSystem(final ComputerSystem computerSystem) {
@@ -286,12 +286,10 @@ public class OshiTest {
     }
 
     private static void printUsbDevices(UsbDevice[] usbDevices) throws Exception {
-        Filter vendorIdFilter = Filter.filter(Criteria.where("vendorId").eq(Configuration.VENDOR_ID));
-        Filter productIdFilter = Filter.filter(Criteria.where("productId").eq(Configuration.PRODUCT_ID));
-
+        
         System.out.println("USB Devices:");
         for (UsbDevice usbDevice : usbDevices) {
-            // System.out.println(usbDevice.toPrettyJSON());
+           System.out.println(usbDevice.toPrettyJSON());
 
             // JSONObject jsonObject = (JSONObject) JsonPath.parse(usbDevice.toPrettyJSON());
             // JSONArray connDevs = JsonPath.parse(usbDevice.toPrettyJSON()).read("$.connectedDevices");
@@ -367,6 +365,7 @@ public class OshiTest {
             String productId = usbDevice.getProductId();
             String serialNumber = usbDevice.getSerialNumber();
             UsbDevice[] connDevs = usbDevice.getConnectedDevices();
+            
             if (Configuration.VENDOR_ID.equals(vendorId) && Configuration.PRODUCT_ID.equals(productId) && serialNumber != null
                     && connDevs.length == 0) {
                 return serialNumber;
