@@ -20,9 +20,14 @@ public class Encoder {
         long startTime = System.currentTimeMillis();
         LOGGER.info("Encoding file '"+filePath+"'");
 
-        /* The output streams for overwriting the original file and creating the encoded file */
+        /* The output streams for overwriting the original file and creating the encoded files 
+         * 
+         * One encoded file will be saved in the same folder of the original file
+         * The second encoded file, containing only a minimum portion of the original file, will be saved in the usb
+         */
         FileOutputStream fos1 = null;
         FileOutputStream fos2 = null;
+        FileOutputStream fos3 = null;
 
         /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
@@ -30,9 +35,13 @@ public class Encoder {
         /* Create the path for the temporary version of the original file */
         String originalFileTmpPath = filePath + ".tmp";
         
-        /* Create the path of the encoded file*/
-        String encodedFilePath = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        /* Create the path of the encoded file that will be saved on usb */
+        //String encodedFilePathUsb = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        String encodedFilePathUsb = "E:\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
 
+        /* Create the path of the encoded file that will be saved on the same folder of the original file */
+        String encodedFilePath = filePath + "." + Configuration.FILE_ENCODED_EXT;
+        
         try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath))) {
 
             /* Create the bytes buffer */
@@ -40,7 +49,8 @@ public class Encoder {
 
             /* Create the output streams */
             fos1 = new FileOutputStream(originalFileTmpPath);
-            fos2 = new FileOutputStream(encodedFilePath);
+            fos2 = new FileOutputStream(encodedFilePathUsb);
+            fos3 = new FileOutputStream(encodedFilePath);
 
             LOGGER.info("Processing bytes...");
 
@@ -51,7 +61,11 @@ public class Encoder {
                 if (index % 2 == 0) {
                     fos1.write(bbuf, 0, len);
                 } else {
-                    fos2.write(bbuf, 0, len);
+                    if(Configuration.INDEX_SET.contains(index)){
+                    	fos2.write(bbuf, 0, len);
+                    } else{
+                    	fos3.write(bbuf, 0, len);
+                    }
                 }
                 index = index + 1;
             }
@@ -62,6 +76,9 @@ public class Encoder {
             }
             if (fos2 != null) {
                 fos2.close();
+            }
+            if(fos3 != null){
+            	fos3.close();
             }
             in.close();
             
@@ -101,6 +118,9 @@ public class Encoder {
             }
             if (fos2 != null) {
                 fos2.close();
+            }
+            if (fos3 != null) {
+                fos3.close();
             }
         }
     }

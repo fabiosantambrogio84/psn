@@ -24,6 +24,7 @@ public class Decoder {
         /* The input streams for reading the files */
         BufferedInputStream bin1 = null;
         BufferedInputStream bin2 = null;
+        BufferedInputStream bin3 = null;
 
         /* The output stream for writing the temporary decoded file */
         FileOutputStream fos1 = null;
@@ -31,8 +32,12 @@ public class Decoder {
         /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
         
-        /* Get the path of the encoded file */
-        String encodedFilePath = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        /* Get the path of the encoded file saved on the usb */
+        //String encodedFilePathUsb = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        String encodedFilePathUsb = "E:\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        
+        /* Get the path of the encoded file saved on the same folder of the original file */
+        String encodedFilePath = filePath + "." + Configuration.FILE_ENCODED_EXT;
         
         /* Create the path for the temporary decoded file */
         String decodedFilePath = filePath + ".decx";
@@ -40,7 +45,8 @@ public class Decoder {
         try {
             /* Create the input streams */
             bin1 = new BufferedInputStream(new FileInputStream(filePath));
-            bin2 = new BufferedInputStream(new FileInputStream(encodedFilePath));
+            bin2 = new BufferedInputStream(new FileInputStream(encodedFilePathUsb));
+            bin3 = new BufferedInputStream(new FileInputStream(encodedFilePath));
 
             /* Create the output stream */
             fos1 = new FileOutputStream(decodedFilePath);
@@ -48,25 +54,36 @@ public class Decoder {
             /* Create the bytes buffer */
             byte[] bbuf1 = new byte[4096];
             byte[] bbuf2 = new byte[4096];
+            byte[] bbuf3 = new byte[4096];
 
             int index = 0;
             int len1 = 0;
             int len2 = 0;
+            int len3 = 0;
             boolean continueProcessing = true;
 
             /* Process the input file */
             while (continueProcessing) {
                 len1 = bin1.read(bbuf1);
-                len2 = bin2.read(bbuf2);
-
+                
                 if (len1 == -1) {
                     continueProcessing = false;
                 } else {
-                    fos1.write(bbuf1);
-                    fos1.write(bbuf2);
-
-                    index = index + 1;
+                	fos1.write(bbuf1);
+                	index = index + 1;
+                	
+                    if(Configuration.INDEX_SET.contains(index)){
+                    	len2 = bin2.read(bbuf2);
+                    	fos1.write(bbuf2);
+                    	index = index + 1;
+                    } else{
+                    	len3 = bin3.read(bbuf3);
+                    	fos1.write(bbuf3);
+                    	index = index + 1;
+                    }
+                    
                 }
+                //index = index + 1;
             }
             
             /* Close the streams */
@@ -76,9 +93,13 @@ public class Decoder {
             if (bin2 != null) {
                 bin2.close();
             }
+            if(bin3 != null){
+            	bin3.close();
+            }
             if (fos1 != null) {
                 fos1.close();
             }
+            
             
             LOGGER.info("File '"+filePath+"' successfully decoded");
             
@@ -99,11 +120,17 @@ public class Decoder {
             boolean deleteResult = originalFileOldVersion.delete();
             LOGGER.info("File '"+originalFileOldVersionPath+"' deleted? "+deleteResult);
             
-            /* Remove the encoded file '.encx' */
+            /* Remove the encoded file '.encx' saved on the usb */
+            LOGGER.info("Deleting file '"+encodedFilePathUsb+"'");
+            File encodedFileUsb = new File(encodedFilePathUsb);
+            boolean deleteResult2 = encodedFileUsb.delete();
+            LOGGER.info("File '"+encodedFilePathUsb+"' deleted? "+deleteResult2);
+            
+            /* Remove the encoded file '.encx' saved on the same folder of the original file */
             LOGGER.info("Deleting file '"+encodedFilePath+"'");
             File encodedFile = new File(encodedFilePath);
-            boolean deleteResult2 = encodedFile.delete();
-            LOGGER.info("File '"+encodedFilePath+"' deleted? "+deleteResult2);
+            boolean deleteResult3 = encodedFile.delete();
+            LOGGER.info("File '"+encodedFilePath+"' deleted? "+deleteResult3);
             
             long endTime = System.currentTimeMillis();
             LOGGER.info("End decoding in " + (endTime - startTime) + " millis");
@@ -121,6 +148,9 @@ public class Decoder {
             }
             if (bin2 != null) {
                 bin2.close();
+            }
+            if(bin3 != null){
+            	bin3.close();
             }
             if (fos1 != null) {
                 fos1.close();
