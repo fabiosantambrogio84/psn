@@ -33,8 +33,7 @@ public class Decoder {
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
         
         /* Get the path of the encoded file saved on the usb */
-        //String encodedFilePathUsb = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
-        String encodedFilePathUsb = "E:\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        String encodedFilePathUsb = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
         
         /* Get the path of the encoded file saved on the same folder of the original file */
         String encodedFilePath = filePath + "." + Configuration.FILE_ENCODED_EXT;
@@ -83,7 +82,6 @@ public class Decoder {
                     }
                     
                 }
-                //index = index + 1;
             }
             
             /* Close the streams */

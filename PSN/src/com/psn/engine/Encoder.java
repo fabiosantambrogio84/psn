@@ -36,9 +36,8 @@ public class Encoder {
         String originalFileTmpPath = filePath + ".tmp";
         
         /* Create the path of the encoded file that will be saved on usb */
-        //String encodedFilePathUsb = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
-        String encodedFilePathUsb = "E:\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
-
+        String encodedFilePathUsb = ".\\" + fileNameNoExt + "." + Configuration.FILE_ENCODED_EXT;
+        
         /* Create the path of the encoded file that will be saved on the same folder of the original file */
         String encodedFilePath = filePath + "." + Configuration.FILE_ENCODED_EXT;
         
