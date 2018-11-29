@@ -70,18 +70,29 @@ public class SystemUtils {
 	private String findUsbSerialNumber(UsbDevice[] usbDevices){
 		String serialNumber = null;
         for (UsbDevice usbDevice : usbDevices) {
+        	System.out.println(usbDevice.toPrettyJSON());
             String vendorId = usbDevice.getVendorId();
             String productId = usbDevice.getProductId();
             String serialNumb = usbDevice.getSerialNumber();
             UsbDevice[] connDevs = usbDevice.getConnectedDevices();
-            if (Configuration.VENDOR_ID.equals(vendorId) && Configuration.PRODUCT_ID.equals(productId) && serialNumb != null
-                    && connDevs.length == 0) {
-                return serialNumb;
-            } else {
+//            System.out.println("VENDOR ID: "+vendorId + " - PRODUCT ID: "+productId + " - SERIAL NUMBER: "+serialNumb);
+//            System.out.println("CONN LENGTH: "+connDevs.length);
+//            System.out.println("--> 1: "+Configuration.VENDOR_ID.equals(vendorId));
+//            System.out.println("--> 2: "+Configuration.PRODUCT_ID.equals(productId));
+//            System.out.println("--> 3: "+(serialNumb != null));
+//            System.out.println("--> 4: "+(connDevs.length == 0));
+//            if (Configuration.VENDOR_ID.equals(vendorId) && Configuration.PRODUCT_ID.equals(productId) && serialNumb != null
+//                    && connDevs.length == 0) {
+//            	return serialNumb;
+//            } 
+            if(connDevs.length == 0){
+            	//System.out.println(vendorId + " - "+productId);
+            }
+            else {
             	serialNumber = findUsbSerialNumber(connDevs);
             }
         }
         return serialNumber;
 	}
-	
+		
 }
