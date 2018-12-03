@@ -4,8 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.psn.engine.DecoderService;
 import com.psn.engine.EncoderService;
@@ -50,7 +49,7 @@ import javafx.util.Callback;
 
 public class Launcher extends Application {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
+	final static Logger logger = Logger.getLogger(Launcher.class);
 	
 	private Context context;
 	
@@ -71,7 +70,7 @@ public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-    	LOGGER.info("Start application");
+    	logger.info("Start application");
     	
     	/* Load initial context */
     	context = Context.getInstance();
@@ -83,7 +82,7 @@ public class Launcher extends Application {
     		e.printStackTrace();
     	}
     	
-    	LOGGER.info("Running on drive '"+context.getRunningDriveLetter()+"'");
+    	logger.info("Running on drive '"+context.getRunningDriveLetter()+"'");
     	
         final EncoderService encoderService = new EncoderService(observableFileList);
         final DecoderService decoderService = new DecoderService(observableFileList);
@@ -246,7 +245,7 @@ public class Launcher extends Application {
                     for (File f : fileList) {
                         PSNFile psnFile = new PSNFile(f.getAbsolutePath());
                         observableFileList.add(psnFile);
-                        LOGGER.info("Add file '"+f.getAbsolutePath()+"'");
+                        //LOGGER.info("Add file '"+f.getAbsolutePath()+"'");
                     }
                     encodeButton.setDisable(false);
                     decodeButton.setDisable(false);

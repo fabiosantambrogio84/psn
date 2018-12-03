@@ -73,6 +73,7 @@
 		<mkdir dir="${dist.lib.dir}" />
 
 		<jar jarfile="${dist.dir}/${projectName}_temp.jar" basedir="${build.dir}">
+			<fileset file="${src.dir}/log4j.properties" />
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}" />
 				<attribute name="Class-Path" value="${classpath.name}" />

@@ -11,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.psn.usb.StreamGobbler;
 
-import oshi.json.hardware.UsbDevice;
-
 public class Context {
 
 	//private SystemUtils systemUtils;
@@ -106,6 +104,7 @@ public class Context {
         }
 	}
 	
+	/*
 	public String getSerialNumber(UsbDevice[] usbDevices) {
         String result = null;
         for (UsbDevice usbDevice : usbDevices) {
@@ -123,7 +122,7 @@ public class Context {
         }
         return result;
 	}
-	
+	*/
 	/*
 	public SystemUtils getSystemUtils() {
 		return systemUtils;
