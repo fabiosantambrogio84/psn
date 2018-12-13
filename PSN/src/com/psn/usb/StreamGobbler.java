@@ -5,9 +5,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 public class StreamGobbler implements Runnable {
     private InputStream inputStream;
-    private Consumer<String> consumer;
+	private Consumer<String> consumer;
     private StringBuilder stringBuilder;
  
     public StreamGobbler(InputStream inputStream, Consumer<String> consumer, StringBuilder stringBuilder) {
