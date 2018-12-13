@@ -60,11 +60,15 @@ public class Launcher extends Application {
 
     private Group root = new Group();
 
-    private ProgressIndicator progressIndicator = new ProgressIndicator(0);
+    private ProgressIndicator encodingProgressIndicator = new ProgressIndicator(0);
+    
+    private ProgressIndicator decodingProgressIndicator = new ProgressIndicator(0);
 
     private StackPane stack = new StackPane();
 
-    private VBox box = new VBox(progressIndicator);
+    private VBox encodingVBox = new VBox(encodingProgressIndicator);
+
+    private VBox decodingVBox = new VBox(decodingProgressIndicator);
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
@@ -184,10 +188,12 @@ public class Launcher extends Application {
             @Override
             public void handle(ActionEvent e) {
                 stack.setDisable(true);
-                box.setVisible(true);
+                encodingVBox.setVisible(true);
+                decodingVBox.setVisible(false);
                 encoderService.restart();
                 encoderService.setOnSucceeded(w -> {
-                    box.setVisible(false);
+                    encodingVBox.setVisible(false);
+                    decodingVBox.setVisible(false);
                     stack.setDisable(false);
                 });
             }
@@ -200,11 +206,13 @@ public class Launcher extends Application {
         decodeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                stack.setDisable(true);
-                box.setVisible(true);
+            	stack.setDisable(true);
+            	decodingVBox.setVisible(true);
+                encodingVBox.setVisible(false);
                 decoderService.restart();
                 decoderService.setOnSucceeded(w -> {
-                    box.setVisible(false);
+                    decodingVBox.setVisible(false);
+                    encodingVBox.setVisible(false);
                     stack.setDisable(false);
                 });
             }
@@ -212,7 +220,6 @@ public class Launcher extends Application {
         decodeButton.setDisable(true);
         decodeButton.setStyle("-fx-font-size:20; -fx-font-weight: bold;");
 
-        
         /* Handle the drag over on the table */
         table.setOnDragOver(new EventHandler<DragEvent>() {
 
@@ -260,17 +267,25 @@ public class Launcher extends Application {
         HBox hBox = new HBox(10, encodeButton, decodeButton);
         hBox.setAlignment(Pos.CENTER);
         
-        Region veil = new Region();
-        veil.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4)");
-        veil.setMaxWidth(800);
-        veil.setMaxHeight(500);
-
-        progressIndicator.setMaxSize(800, 500);
-        progressIndicator.progressProperty().bind(encoderService.progressProperty());
-        veil.visibleProperty().bind(encoderService.runningProperty());
-        progressIndicator.visibleProperty().bind(encoderService.runningProperty());
+        Region encodingVeil = new Region();
+        encodingVeil.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4)");
+        encodingVeil.setMaxWidth(800);
+        encodingVeil.setMaxHeight(500);
+        encodingProgressIndicator.setMaxSize(800, 500);
+        encodingProgressIndicator.progressProperty().bind(encoderService.progressProperty());
+        encodingVeil.visibleProperty().bind(encoderService.runningProperty());
+        encodingProgressIndicator.visibleProperty().bind(encoderService.runningProperty());
         // table.itemsProperty().bind(service.valueProperty());
 
+        Region decodingVeil = new Region();
+        decodingVeil.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4)");
+        decodingVeil.setMaxWidth(800);
+        decodingVeil.setMaxHeight(500);
+        decodingProgressIndicator.setMaxSize(800, 500);
+        decodingProgressIndicator.progressProperty().bind(decoderService.progressProperty());
+        decodingVeil.visibleProperty().bind(decoderService.runningProperty());
+        decodingProgressIndicator.visibleProperty().bind(decoderService.runningProperty());
+        
         /* Create the vertical box containing the title, the table and the buttons */
         VBox vBox = new VBox(0, label, table, hBox);
         vBox.setSpacing(5);
@@ -282,16 +297,20 @@ public class Launcher extends Application {
         // BorderWidths.DEFAULT)));
         stack.getChildren().addAll(vBox);
 
-        box.setMinSize(800, 500);
-        box.setMaxSize(800, 500);
-        box.setAlignment(Pos.CENTER);
-        box.setVisible(false);
+        encodingVBox.setMinSize(800, 500);
+        encodingVBox.setMaxSize(800, 500);
+        encodingVBox.setAlignment(Pos.CENTER);
+        encodingVBox.setVisible(false);
 
-        root.getChildren().addAll(stack, box);
+        decodingVBox.setMinSize(800, 500);
+        decodingVBox.setMaxSize(800, 500);
+        decodingVBox.setAlignment(Pos.CENTER);
+        decodingVBox.setVisible(false);
+        
+        root.getChildren().addAll(stack, encodingVBox, decodingVBox);
 
         /* Create the scene */
         Scene scene = new Scene(root, 800, 500);
-        // scene.getStylesheets().add("style/button-styles.css");
 
         /* Add the scene to the stage */
         primaryStage.setScene(scene);
