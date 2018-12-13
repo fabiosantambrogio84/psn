@@ -1,9 +1,11 @@
 package com.psn.engine;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 
@@ -21,12 +23,12 @@ public class Decoder {
         logger.info("Decoding file '" + filePath + "'");
 
         /* The input streams for reading the files */
-        BufferedInputStream bin1 = null;
-        BufferedInputStream bin2 = null;
-        BufferedInputStream bin3 = null;
+        InputStream bin1 = null;
+        InputStream bin2 = null;
+        InputStream bin3 = null;
 
         /* The output stream for writing the temporary decoded file */
-        FileOutputStream fos1 = null;
+        OutputStream fos1 = null;
 
         /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
@@ -42,17 +44,20 @@ public class Decoder {
 
         try {
             /* Create the input streams */
-            bin1 = new BufferedInputStream(new FileInputStream(filePath));
-            bin2 = new BufferedInputStream(new FileInputStream(encodedFilePathUsb));
-            bin3 = new BufferedInputStream(new FileInputStream(encodedFilePath));
+//            bin1 = new BufferedInputStream(new FileInputStream(filePath));
+//            bin2 = new BufferedInputStream(new FileInputStream(encodedFilePathUsb));
+//            bin3 = new BufferedInputStream(new FileInputStream(encodedFilePath));
+        	bin1 = new FileInputStream(filePath);
+            bin2 = new FileInputStream(encodedFilePathUsb);
+            bin3 = new FileInputStream(encodedFilePath);
 
             /* Create the output stream */
-            fos1 = new FileOutputStream(decodedFilePath);
+            fos1 = new BufferedOutputStream(new FileOutputStream(decodedFilePath), Configuration.BUFFER_SIZE);
 
             /* Create the bytes buffer */
-            byte[] bbuf1 = new byte[4096];
-            byte[] bbuf2 = new byte[4096];
-            byte[] bbuf3 = new byte[4096];
+            byte[] bbuf1 = new byte[Configuration.BUFFER_SIZE];
+            byte[] bbuf2 = new byte[Configuration.BUFFER_SIZE];
+            byte[] bbuf3 = new byte[Configuration.BUFFER_SIZE];
 
             int index = 0;
             int len1 = 0;

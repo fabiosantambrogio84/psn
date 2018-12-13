@@ -1,9 +1,10 @@
 package com.psn.engine;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 
@@ -24,9 +25,9 @@ public class Encoder {
          * One encoded file will be saved in the same folder of the original file
          * The second encoded file, containing only a minimum portion of the original file, will be saved in the usb
          */
-        FileOutputStream fos1 = null;
-        FileOutputStream fos2 = null;
-        FileOutputStream fos3 = null;
+        OutputStream fos1 = null;
+        OutputStream fos2 = null;
+        OutputStream fos3 = null;
 
         /* Get the file name without extension */
         String fileNameNoExt = Utils.getFileNameNoExt(filePath);
@@ -40,23 +41,32 @@ public class Encoder {
         /* Create the path of the encoded file that will be saved on the same folder of the original file */
         String encodedFilePath = filePath + "." + Configuration.FILE_ENCODED_EXT;
         
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath))) {
-
-            /* Create the bytes buffer */
-            byte[] bbuf = new byte[4096];
+//        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(filePath), Configuration.BUFFER_SIZE)) {
+        try (FileInputStream in = new FileInputStream(filePath)) {	
+            
+        	/* Create the bytes buffer */
+            byte[] bbuf = new byte[Configuration.BUFFER_SIZE];
 
             /* Create the output streams */
-            fos1 = new FileOutputStream(originalFileTmpPath);
-            fos2 = new FileOutputStream(encodedFilePathUsb);
-            fos3 = new FileOutputStream(encodedFilePath);
+            fos1 = new BufferedOutputStream(new FileOutputStream(originalFileTmpPath), Configuration.BUFFER_SIZE);
+            fos2 = new BufferedOutputStream(new FileOutputStream(encodedFilePathUsb), Configuration.BUFFER_SIZE);
+            fos3 = new BufferedOutputStream(new FileOutputStream(encodedFilePath), Configuration.BUFFER_SIZE);
 
+//            Path path = Paths.get(originalFileTmpPath);
+//            try(BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("UTF-8"))){
+//            	writer.write("To be, or not to be. That is the question.");
+//            }catch(IOException ex){
+//            	ex.printStackTrace();
+//            }
+            
             logger.info("Processing bytes...");
 
             /* Process bytes */
             int len = 0;
             int index = 0;
             while ((len = in.read(bbuf)) != -1) {
-                if (index % 2 == 0) {
+            	
+            	if (index % 2 == 0) {
                     fos1.write(bbuf, 0, len);
                 } else {
                     if(Configuration.INDEX_SET.contains(index)){
